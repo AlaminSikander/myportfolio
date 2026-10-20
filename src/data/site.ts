@@ -11,6 +11,8 @@ export const person = {
   email: "alamin.6534@gmail.com",
   phone: "+8801725104909",
   phoneDisplay: "+880 1725 104909",
+  whatsappMessage:
+    "Hi Al Amin, I came across your portfolio and would like to discuss a project or opportunity with you.",
   linkedin: "https://www.linkedin.com/in/al-amin-sikander/",
   location: "Dhaka, Bangladesh",
   cvPath: "/documents/Md-Al-Amin-Sikander-CV.pdf",
@@ -18,6 +20,8 @@ export const person = {
   tagline:
     "Software QA Engineer, SEO Specialist, and Management & Operations professional helping teams ship reliable, discoverable digital products.",
 } as const;
+
+export const whatsappUrl = `https://wa.me/${person.phone.replace(/\D/g, "")}?text=${encodeURIComponent(person.whatsappMessage)}`;
 
 export const seo = {
   title: "Md Al Amin Sikander — Software QA Engineer, SEO Specialist & Operations Professional",

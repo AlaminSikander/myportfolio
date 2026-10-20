@@ -1,9 +1,9 @@
-import { ArrowUpRight, Mail, Phone } from "lucide-react";
+import { ArrowUpRight, Mail } from "lucide-react";
 import { ContactForm } from "@/components/sections/ContactForm";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
-import { LinkedInIcon } from "@/components/ui/Icons";
-import { person } from "@/data/site";
+import { LinkedInIcon, WhatsAppIcon } from "@/components/ui/Icons";
+import { person, whatsappUrl } from "@/data/site";
 
 const channels = [
   {
@@ -15,12 +15,12 @@ const channels = [
     tone: "bg-ember-600",
   },
   {
-    label: "Phone",
+    label: "WhatsApp",
     value: person.phoneDisplay,
-    href: `tel:${person.phone}`,
-    icon: Phone,
-    external: false,
-    tone: "bg-mint-600",
+    href: whatsappUrl,
+    icon: WhatsAppIcon,
+    external: true,
+    tone: "bg-[#1da851]",
   },
   {
     label: "LinkedIn",
