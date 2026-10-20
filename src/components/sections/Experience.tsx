@@ -1,13 +1,13 @@
 import { CalendarDays, ChevronDown, MapPin } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { experience } from "@/data/experience";
 import { accentStyles } from "@/lib/accent";
 import { cn } from "@/lib/cn";
+import type { Experience as ExperienceItem } from "@/types";
 
 const VISIBLE_ITEMS = 4;
 
-export function Experience() {
+export function Experience({ experience }: { experience: ExperienceItem[] }) {
   return (
     <section id="experience" aria-labelledby="experience-title" className="section-pad relative bg-white">
       <div className="container-page">
@@ -33,7 +33,7 @@ export function Experience() {
               const visible = job.responsibilities.slice(0, VISIBLE_ITEMS);
               const hidden = job.responsibilities.slice(VISIBLE_ITEMS);
               return (
-                <li key={job.company} className="relative grid gap-4 pl-12 md:grid-cols-[10rem_1fr] md:gap-12 md:pl-0">
+                <li key={job.id} className="relative grid gap-4 pl-12 md:grid-cols-[10rem_1fr] md:gap-12 md:pl-0">
                   <Reveal className="md:pt-6 md:text-right">
                     <p className="inline-flex items-center gap-1.5 font-display text-sm font-bold text-ink-900">
                       <CalendarDays aria-hidden className="size-4 text-subtle md:hidden" />
@@ -68,10 +68,13 @@ export function Experience() {
                           <h3 className="text-xl font-extrabold sm:text-2xl">{job.role}</h3>
                           <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                             <span className={cn("font-display font-bold", accent.text)}>{job.company}</span>
-                            <span className="inline-flex items-center gap-1 text-muted">
-                              <MapPin aria-hidden className="size-3.5" />
-                              {job.location}
-                            </span>
+                            {job.location ? (
+                              <span className="inline-flex items-center gap-1 text-muted">
+                                <MapPin aria-hidden className="size-3.5" />
+                                {job.location}
+                              </span>
+                            ) : null}
+                            {job.employmentType ? <span className="text-muted">{job.employmentType}</span> : null}
                           </p>
                         </div>
                       </div>
@@ -107,6 +110,30 @@ export function Experience() {
                             ))}
                           </ul>
                         </details>
+                      ) : null}
+
+                      {job.achievements.length > 0 ? (
+                        <div className="mt-5 rounded-2xl bg-canvas p-4">
+                          <h4 className="font-display text-sm font-bold text-ink-950">Key achievements</h4>
+                          <ul className="mt-2.5 space-y-2 text-[0.93rem] text-ink-800">
+                            {job.achievements.map((item) => (
+                              <li key={item} className="flex gap-2.5">
+                                <span aria-hidden className={cn("mt-2 size-1.5 shrink-0 rounded-full", accent.dot)} />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+
+                      {job.technologies.length > 0 ? (
+                        <ul className="mt-5 flex flex-wrap gap-1.5" aria-label={`Technologies used at ${job.company}`}>
+                          {job.technologies.map((tech) => (
+                            <li key={tech} className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", accent.softBg, accent.text)}>
+                              {tech}
+                            </li>
+                          ))}
+                        </ul>
                       ) : null}
                     </article>
                   </Reveal>

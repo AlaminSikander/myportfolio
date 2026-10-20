@@ -1,7 +1,6 @@
 import { Briefcase, GraduationCap, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
-import { softSkills } from "@/data/skills";
 import { cn } from "@/lib/cn";
 
 const journey = [
@@ -44,7 +43,24 @@ const principles = [
   { title: "Communicate early", text: "Raising risks during requirement and design reviews, not after release." },
 ];
 
-export function About() {
+/** Splits plain text into paragraphs (blank-line separated) with `**bold**` spans. */
+function paragraphs(text: string) {
+  return text
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) =>
+      block
+        .replace(/\s*\n\s*/g, " ")
+        .split(/(\*\*[^*]+\*\*)/g)
+        .filter(Boolean)
+        .map((part) =>
+          part.startsWith("**") && part.endsWith("**") ? { text: part.slice(2, -2), bold: true } : { text: part, bold: false },
+        ),
+    );
+}
+
+export function About({ about, softSkills }: { about: string; softSkills: string[] }) {
   return (
     <section id="about" aria-labelledby="about-title" className="section-pad relative overflow-hidden">
       <div
@@ -63,28 +79,19 @@ export function About() {
             }
           />
           <Reveal delay={0.1} className="mt-7 space-y-5 text-base leading-relaxed text-muted sm:text-[1.05rem]">
-            <p>
-              I&apos;m a versatile professional with{" "}
-              <strong className="font-semibold text-ink-900">4+ years of experience</strong> across quality assurance,
-              SEO and digital marketing, e-commerce, supply research, and management operations. My background in
-              Computer Science and Engineering gives me a solid technical foundation for all of it.
-            </p>
-            <p>
-              As a <strong className="font-semibold text-ink-900">Software QA Engineer</strong>, I approach quality as
-              something built in from the start. I review business requirements, user flows, and Figma designs before
-              development, then carry out functional, regression, integration, and UI/UX testing across browsers and
-              devices — documenting defects clearly so teams can fix them quickly.
-            </p>
-            <p>
-              My SEO experience keeps me interested in how websites are discovered. From keyword research to technical
-              audits, metadata, and page speed, I enjoy making sites easier for search engines to crawl and for people
-              to find.
-            </p>
-            <p>
-              Alongside testing, I coordinate tasks and projects, support recruitment and onboarding, and prepare
-              reports for management. I explain technical issues in plain language to non-technical stakeholders and
-              rely on analytical thinking, attention to detail, and problem-solving to keep work moving.
-            </p>
+            {paragraphs(about).map((paragraph, index) => (
+              <p key={index}>
+                {paragraph.map((part, partIndex) =>
+                  part.bold ? (
+                    <strong key={partIndex} className="font-semibold text-ink-900">
+                      {part.text}
+                    </strong>
+                  ) : (
+                    part.text
+                  ),
+                )}
+              </p>
+            ))}
           </Reveal>
 
           <RevealGroup as="ul" className="mt-8 flex flex-wrap gap-2.5">

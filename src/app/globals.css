@@ -161,6 +161,79 @@
     background-image: linear-gradient(90deg, var(--color-mint-500), var(--color-azure-500), var(--color-ember-500), var(--color-mint-500));
     background-size: 200% 100%;
   }
+
+  /* Long-form Markdown content (blog articles and project write-ups). */
+  .prose-article {
+    @apply text-[1.05rem] leading-[1.8] text-ink-800;
+
+    & > * + * {
+      margin-top: 1.25em;
+    }
+    & h2 {
+      @apply mt-12 scroll-mt-24 text-2xl leading-tight font-extrabold sm:text-[1.75rem];
+    }
+    & h3 {
+      @apply mt-9 scroll-mt-24 text-xl leading-snug font-extrabold;
+    }
+    & h4 {
+      @apply mt-7 text-lg font-bold;
+    }
+    & h2 + *,
+    & h3 + *,
+    & h4 + * {
+      margin-top: 0.75em;
+    }
+    & a {
+      @apply font-semibold text-ember-700 underline decoration-ember-200 decoration-2 underline-offset-[3px] transition-colors hover:decoration-ember-600;
+    }
+    & strong {
+      @apply font-semibold text-ink-950;
+    }
+    & ul,
+    & ol {
+      @apply space-y-2 pl-6;
+    }
+    & ul {
+      @apply list-disc marker:text-ember-500;
+    }
+    & ol {
+      @apply list-decimal marker:font-bold marker:text-ink-600;
+    }
+    & li > ul,
+    & li > ol {
+      @apply mt-2;
+    }
+    & blockquote {
+      @apply rounded-r-2xl border-l-4 border-ember-500 bg-ember-50/60 py-3 pr-5 pl-5 text-ink-900 italic;
+    }
+    & code {
+      @apply rounded-md bg-canvas px-1.5 py-0.5 font-mono text-[0.88em] text-ink-950 ring-1 ring-line;
+    }
+    & pre {
+      @apply overflow-x-auto rounded-2xl bg-ink-950 p-5 text-sm leading-relaxed text-white;
+    }
+    & pre code {
+      @apply bg-transparent p-0 text-inherit ring-0;
+    }
+    & img {
+      @apply h-auto max-w-full rounded-2xl ring-1 ring-line;
+    }
+    & hr {
+      @apply my-10 border-line;
+    }
+    & .table-wrap {
+      @apply overflow-x-auto rounded-2xl ring-1 ring-line;
+    }
+    & table {
+      @apply w-full text-left text-[0.95rem];
+    }
+    & th {
+      @apply bg-canvas px-4 py-2.5 font-bold text-ink-950;
+    }
+    & td {
+      @apply border-t border-line px-4 py-2.5;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,15 +1,18 @@
-import type { Project, ProjectCategory } from "@/types";
+import type { projects as projectsTable } from "@/db/schema";
+import type { Accent, ProjectDetailGroup } from "@/types";
 
-export const projectCategoryLabels: Record<ProjectCategory, string> = {
-  qa: "QA & Testing",
-  seo: "SEO & Digital Marketing",
+type ProjectSource = {
+  slug: string;
+  name: string;
+  url: string;
+  categories: string[];
+  summary: string;
+  details: ProjectDetailGroup[];
+  screenshot?: string;
+  accent: Accent;
 };
 
-export const projectFilters: { id: "all" | ProjectCategory; label: string }[] = [
-  { id: "all", label: "All Projects" },
-  { id: "qa", label: "QA & Testing" },
-  { id: "seo", label: "SEO & Digital Marketing" },
-];
+type ProjectSeed = Omit<typeof projectsTable.$inferInsert, "id" | "createdAt" | "updatedAt">;
 
 const seoScope = {
   heading: "SEO focus areas",
@@ -31,12 +34,11 @@ const qaScope = {
   ],
 };
 
-export const projects: Project[] = [
+const projectSources: ProjectSource[] = [
   {
     slug: "truckall",
     name: "Truckall",
     url: "https://beta.truckall.au/",
-    displayUrl: "beta.truckall.au",
     categories: ["qa"],
     accent: "teal",
     screenshot: "/images/projects/truckall.webp",
@@ -65,7 +67,6 @@ export const projects: Project[] = [
     slug: "topspot-studio",
     name: "Topspot Studio",
     url: "https://topspotstudio.com/",
-    displayUrl: "topspotstudio.com",
     categories: ["seo", "qa"],
     accent: "blue",
     screenshot: "/images/projects/topspot-studio.webp",
@@ -84,7 +85,6 @@ export const projects: Project[] = [
     slug: "st-amar-bari-resort",
     name: "S T Amar Bari Resort",
     url: "http://stamarbari.com",
-    displayUrl: "stamarbari.com",
     categories: ["seo", "qa"],
     accent: "ember",
     summary: "SEO and website quality checks for a resort website, covering search basics and the visitor experience.",
@@ -101,7 +101,6 @@ export const projects: Project[] = [
     slug: "anyhelpnow",
     name: "AnyHelpNow",
     url: "https://anyhelpnow.com/",
-    displayUrl: "anyhelpnow.com",
     categories: ["seo"],
     accent: "blue",
     screenshot: "/images/projects/anyhelpnow.webp",
@@ -121,7 +120,6 @@ export const projects: Project[] = [
     slug: "autoretouch",
     name: "AutoRetouch",
     url: "https://www.autoretouch.com/",
-    displayUrl: "autoretouch.com",
     categories: ["seo"],
     accent: "teal",
     screenshot: "/images/projects/autoretouch.webp",
@@ -139,7 +137,6 @@ export const projects: Project[] = [
     slug: "kolhub",
     name: "Kolhub",
     url: "https://kolhub.com/my",
-    displayUrl: "kolhub.com/my",
     categories: ["seo"],
     accent: "ember",
     screenshot: "/images/projects/kolhub.webp",
@@ -156,7 +153,6 @@ export const projects: Project[] = [
     slug: "leantute",
     name: "Leantute",
     url: "https://leantute.com/",
-    displayUrl: "leantute.com",
     categories: ["seo"],
     accent: "blue",
     screenshot: "/images/projects/leantute.webp",
@@ -171,3 +167,25 @@ export const projects: Project[] = [
     ],
   },
 ];
+
+/** Initial projects. After seeding, the database (managed at /admin/projects) is the source of truth. */
+export const projectSeed: ProjectSeed[] = projectSources.map((project, index) => ({
+  title: project.name,
+  slug: project.slug,
+  summary: project.summary,
+  content: "",
+  details: project.details,
+  image: project.screenshot ?? null,
+  imageAlt: project.screenshot ? `Screenshot of the ${project.name} homepage` : "",
+  gallery: [],
+  categories: project.categories,
+  technologies: [],
+  liveUrl: project.url,
+  githubUrl: null,
+  startDate: null,
+  completedDate: null,
+  featured: false,
+  status: "published",
+  accent: project.accent,
+  sortOrder: index,
+}));

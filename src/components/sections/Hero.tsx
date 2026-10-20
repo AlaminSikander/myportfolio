@@ -1,19 +1,21 @@
 import { ArrowRight, Download, MessageSquare } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { HeroVisual } from "@/components/sections/HeroVisual";
-import { person } from "@/data/site";
-import { projects } from "@/data/projects";
-import { experience } from "@/data/experience";
+import type { Experience, SiteSettings } from "@/types";
 
-const current = experience.find((job) => job.current);
+type HeroProps = {
+  settings: SiteSettings;
+  current?: Experience;
+  projectCount: number;
+};
 
-const facts = [
-  { value: "4+", label: "Years of professional experience" },
-  { value: "3", label: "Disciplines: QA, SEO & Operations" },
-  { value: String(projects.length), label: "Featured website projects" },
-];
+export function Hero({ settings, current, projectCount }: HeroProps) {
+  const facts = [
+    { value: "4+", label: "Years of professional experience" },
+    { value: "3", label: "Disciplines: QA, SEO & Operations" },
+    { value: String(projectCount), label: "Featured website projects" },
+  ];
 
-export function Hero() {
   return (
     <section
       id="home"
@@ -43,7 +45,7 @@ export function Hero() {
             className="animate-rise mt-6 font-display text-sm font-bold tracking-wide text-ember-600 sm:text-base"
             style={{ animationDelay: "80ms" }}
           >
-            {person.roleLine}
+            {settings.roleLine}
           </p>
 
           <h1
@@ -77,7 +79,7 @@ export function Hero() {
             className="animate-rise mt-7 max-w-xl text-base leading-relaxed text-muted sm:text-lg"
             style={{ animationDelay: "220ms" }}
           >
-            I&apos;m <strong className="font-semibold text-ink-900">{person.name}</strong>, a Software QA professional
+            I&apos;m <strong className="font-semibold text-ink-900">{settings.name}</strong>, a Software QA professional
             with experience in SEO, digital marketing, and management operations. I help teams improve software quality,
             website visibility, and day-to-day project delivery.
           </p>
@@ -94,16 +96,18 @@ export function Hero() {
             >
               Contact Me
             </ButtonLink>
-            <ButtonLink
-              href={person.cvPath}
-              size="lg"
-              variant="ghost"
-              download
-              icon={<Download aria-hidden className="size-4" />}
-              aria-label="Download CV of Md Al Amin Sikander (PDF)"
-            >
-              Download CV
-            </ButtonLink>
+            {settings.cvUrl ? (
+              <ButtonLink
+                href={settings.cvUrl}
+                size="lg"
+                variant="ghost"
+                download
+                icon={<Download aria-hidden className="size-4" />}
+                aria-label={`Download CV of ${settings.name} (PDF)`}
+              >
+                Download CV
+              </ButtonLink>
+            ) : null}
           </div>
 
           <dl
@@ -120,7 +124,7 @@ export function Hero() {
           </dl>
         </div>
 
-        <HeroVisual />
+        <HeroVisual name={settings.name} photoUrl={settings.photo} location={settings.location} />
       </div>
     </section>
   );

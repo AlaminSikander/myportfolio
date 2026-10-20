@@ -4,9 +4,9 @@ import { forwardRef } from "react";
 import { motion } from "motion/react";
 import { ArrowUpRight, Eye } from "lucide-react";
 import type { Project } from "@/types";
-import { projectCategoryLabels } from "@/data/projects";
 import { accentStyles } from "@/lib/accent";
 import { cn } from "@/lib/cn";
+import { projectCategoryLabel, projectCategoryTone } from "@/lib/project-categories";
 import { ProjectThumbnail } from "@/components/ui/ProjectThumbnail";
 
 type ProjectCardProps = {
@@ -55,10 +55,10 @@ export const ProjectCard = forwardRef<HTMLLIElement, ProjectCardProps>(function 
                 key={category}
                 className={cn(
                   "rounded-full px-2.5 py-1 text-[0.7rem] font-bold tracking-wide uppercase",
-                  category === "qa" ? "bg-mint-50 text-mint-700" : "bg-azure-50 text-azure-700",
+                  projectCategoryTone(category),
                 )}
               >
-                {projectCategoryLabels[category]}
+                {projectCategoryLabel(category)}
               </li>
             ))}
           </ul>
@@ -76,6 +76,7 @@ export const ProjectCard = forwardRef<HTMLLIElement, ProjectCardProps>(function 
               <Eye aria-hidden className="size-4" />
               View Details
             </button>
+            {project.url ? (
             <a
               href={project.url}
               target="_blank"
@@ -95,6 +96,7 @@ export const ProjectCard = forwardRef<HTMLLIElement, ProjectCardProps>(function 
                 />
               </span>
             </a>
+            ) : null}
           </div>
         </div>
       </article>

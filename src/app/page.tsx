@@ -1,83 +1,64 @@
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { Hero } from "@/components/sections/Hero";
-import { Overview } from "@/components/sections/Overview";
+import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { SiteShell } from "@/components/layout/SiteShell";
 import { About } from "@/components/sections/About";
-import { Experience } from "@/components/sections/Experience";
-import { Skills } from "@/components/sections/Skills";
-import { Projects } from "@/components/sections/Projects";
-import { Education } from "@/components/sections/Education";
 import { Contact } from "@/components/sections/Contact";
-import { ScrollProgress } from "@/components/ui/ScrollProgress";
-import { BackToTop } from "@/components/ui/BackToTop";
-import { person, seo, siteUrl } from "@/data/site";
-import { experience } from "@/data/experience";
-import { skillCategories } from "@/data/skills";
+import { Education } from "@/components/sections/Education";
+import { Experience } from "@/components/sections/Experience";
+import { Hero } from "@/components/sections/Hero";
+import { LatestPosts } from "@/components/sections/LatestPosts";
+import { Overview } from "@/components/sections/Overview";
+import { Projects } from "@/components/sections/Projects";
+import { Skills } from "@/components/sections/Skills";
+import { siteUrl } from "@/data/site";
+import { getExperiences, getLatestPosts, getProjects, getSettings, getSkillCategories } from "@/lib/content";
+import { graph, pageMetadata, personJsonLd, siteName, websiteJsonLd } from "@/lib/seo";
 
-const currentJob = experience.find((job) => job.current);
+export const revalidate = 3600;
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Person",
-      "@id": `${siteUrl}/#person`,
-      name: person.name,
-      alternateName: person.shortName,
-      url: siteUrl,
-      image: `${siteUrl}${person.photo}`,
-      email: `mailto:${person.email}`,
-      telephone: person.phone,
-      jobTitle: person.roles,
-      description: seo.description,
-      sameAs: [person.linkedin],
-      address: { "@type": "PostalAddress", addressLocality: "Dhaka", addressCountry: "BD" },
-      ...(currentJob ? { worksFor: { "@type": "Organization", name: currentJob.company } } : {}),
-      alumniOf: {
-        "@type": "CollegeOrUniversity",
-        name: "IUBAT — International University of Business Agriculture and Technology",
-      },
-      knowsAbout: skillCategories.flatMap((category) => category.skills).slice(0, 30),
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${siteUrl}/#website`,
-      url: siteUrl,
-      name: `${person.name} — Portfolio`,
-      inLanguage: "en",
-      publisher: { "@id": `${siteUrl}/#person` },
-    },
-    {
-      "@type": "ProfilePage",
-      "@id": `${siteUrl}/#profile`,
-      url: siteUrl,
-      name: seo.title,
-      mainEntity: { "@id": `${siteUrl}/#person` },
-    },
-  ],
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return pageMetadata({
+    settings,
+    title: settings.seoTitle,
+    absoluteTitle: true,
+    description: settings.seoDescription,
+    path: "/",
+    type: "profile",
+  });
+}
 
-export default function Home() {
+export default async function Home() {
+  const [settings, experiences, skills, projects, latestPosts] = await Promise.all([
+    getSettings(),
+    getExperiences(),
+    getSkillCategories(),
+    getProjects(),
+    getLatestPosts(3),
+  ]);
+
+  const jsonLd = graph(personJsonLd(settings, experiences, skills), websiteJsonLd(settings), {
+    "@type": "ProfilePage",
+    "@id": `${siteUrl}/#profile`,
+    url: siteUrl,
+    name: siteName(settings),
+    mainEntity: { "@id": `${siteUrl}/#person` },
+  });
+
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
-      />
-      <ScrollProgress />
-      <Navbar />
-      <main id="main">
-        <Hero />
+      <JsonLd data={jsonLd} />
+      <SiteShell>
+        <Hero settings={settings} current={experiences.find((job) => job.current)} projectCount={projects.length} />
         <Overview />
-        <About />
-        <Experience />
-        <Skills />
-        <Projects />
+        <About about={settings.about} softSkills={settings.softSkills} />
+        <Experience experience={experiences} />
+        <Skills categories={skills} />
+        <Projects projects={projects} />
         <Education />
-        <Contact />
-      </main>
-      <Footer />
-      <BackToTop />
+        {latestPosts.length ? <LatestPosts posts={latestPosts} /> : null}
+        <Contact settings={settings} />
+      </SiteShell>
     </>
   );
 }

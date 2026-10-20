@@ -2,12 +2,14 @@ import Image from "next/image";
 import { ImageOff } from "lucide-react";
 import type { Project } from "@/types";
 import { cn } from "@/lib/cn";
+import { isOptimizableImage } from "@/lib/images";
 
 type ProjectThumbnailProps = {
-  project: Project;
+  project: Pick<Project, "name" | "displayUrl" | "screenshot" | "imageAlt">;
   sizes: string;
   className?: string;
   imageClassName?: string;
+  priority?: boolean;
 };
 
 function initials(name: string) {
@@ -19,7 +21,7 @@ function initials(name: string) {
     .join("");
 }
 
-export function ProjectThumbnail({ project, sizes, className, imageClassName }: ProjectThumbnailProps) {
+export function ProjectThumbnail({ project, sizes, className, imageClassName, priority }: ProjectThumbnailProps) {
   return (
     <div className={cn("relative overflow-hidden bg-ink-900", className)}>
       <div className="relative z-10 flex h-7 items-center gap-1.5 border-b border-black/5 bg-white/95 px-3">
@@ -34,9 +36,11 @@ export function ProjectThumbnail({ project, sizes, className, imageClassName }: 
         {project.screenshot ? (
           <Image
             src={project.screenshot}
-            alt={`Screenshot of the ${project.name} homepage`}
+            alt={project.imageAlt || `Screenshot of the ${project.name} homepage`}
             fill
             sizes={sizes}
+            priority={priority}
+            unoptimized={!isOptimizableImage(project.screenshot)}
             className={cn("object-cover object-top", imageClassName)}
           />
         ) : (

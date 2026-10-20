@@ -1,9 +1,9 @@
 import { ImageResponse } from "next/og";
-import { person } from "@/data/site";
+import { getSettings } from "@/lib/content";
 
-export const alt = `${person.name} — Software QA Engineer, SEO Specialist & Operations Professional`;
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const revalidate = 3600;
+
+const size = { width: 1200, height: 630 };
 
 const pillars = [
   { label: "Quality Assurance", color: "#12b597" },
@@ -11,7 +11,9 @@ const pillars = [
   { label: "Management & Operations", color: "#f05a24" },
 ];
 
-export default function OpengraphImage() {
+/** Default social share image, used when no custom image is set in admin settings. */
+export async function GET() {
+  const person = await getSettings();
   return new ImageResponse(
     <div
       style={{
@@ -42,7 +44,8 @@ export default function OpengraphImage() {
             fontWeight: 800,
           }}
         >
-          A<span style={{ color: "#f05a24" }}>.</span>
+          {person.shortName.charAt(0)}
+          <span style={{ color: "#f05a24" }}>.</span>
         </div>
         <div style={{ fontSize: 28, fontWeight: 700, opacity: 0.85 }}>Portfolio</div>
       </div>

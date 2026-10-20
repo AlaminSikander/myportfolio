@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
-import { person, seo } from "@/data/site";
+import { getSettings } from "@/lib/content";
+import { siteName } from "@/lib/seo";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const settings = await getSettings();
   return {
-    name: `${person.name} — Portfolio`,
-    short_name: person.shortName,
-    description: seo.description,
+    name: siteName(settings),
+    short_name: settings.shortName,
+    description: settings.seoDescription,
     start_url: "/",
     display: "browser",
     background_color: "#f6f7fb",

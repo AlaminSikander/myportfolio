@@ -1,11 +1,22 @@
-import type { SkillCategory } from "@/types";
+import type { Accent } from "@/types";
 
-export const skillCategories: SkillCategory[] = [
+type SkillCategorySeed = {
+  slug: string;
+  label: string;
+  description: string;
+  accent: Accent;
+  icon: string;
+  skills: string[];
+};
+
+/** Initial skills. After seeding, the database (managed at /admin/skills) is the source of truth. */
+export const skillCategorySeed: SkillCategorySeed[] = [
   {
-    id: "qa",
+    slug: "qa",
     label: "Quality Assurance",
     description: "Manual software testing across web and mobile, from requirements to release.",
     accent: "teal",
+    icon: "shield",
     skills: [
       "Functional Testing",
       "Regression Testing",
@@ -24,10 +35,11 @@ export const skillCategories: SkillCategory[] = [
     ],
   },
   {
-    id: "seo",
+    slug: "seo",
     label: "SEO & Digital Marketing",
     description: "Search research, optimization, and reporting with industry-standard tools.",
     accent: "blue",
+    icon: "search",
     skills: [
       "Keyword Research",
       "On-Page SEO",
@@ -48,10 +60,11 @@ export const skillCategories: SkillCategory[] = [
     ],
   },
   {
-    id: "ecommerce",
+    slug: "ecommerce",
     label: "E-commerce & Research",
     description: "Product, supplier, and market research that supports sourcing decisions.",
     accent: "ember",
+    icon: "cart",
     skills: [
       "Amazon FBA",
       "Product Research",
@@ -63,10 +76,11 @@ export const skillCategories: SkillCategory[] = [
     ],
   },
   {
-    id: "operations",
+    slug: "operations",
     label: "Management & Operations",
     description: "Coordination and people operations that keep teams moving.",
     accent: "ember",
+    icon: "users",
     skills: [
       "Team Coordination",
       "Task and Project Coordination",
@@ -80,10 +94,11 @@ export const skillCategories: SkillCategory[] = [
     ],
   },
   {
-    id: "it",
+    slug: "it",
     label: "IT Support",
     description: "Hands-on support for systems, accounts, hardware, and everyday IT needs.",
     accent: "teal",
+    icon: "monitor",
     skills: [
       "Software Installation and Configuration",
       "Hardware Setup and Troubleshooting",
@@ -94,13 +109,4 @@ export const skillCategories: SkillCategory[] = [
       "System Maintenance",
     ],
   },
-];
-
-export const softSkills = [
-  "Analytical thinking",
-  "Attention to detail",
-  "Clear communication",
-  "Problem-solving",
-  "Team collaboration",
-  "Time management",
 ];

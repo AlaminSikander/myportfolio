@@ -4,9 +4,9 @@ import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, CheckCircle2, X } from "lucide-react";
 import type { Project } from "@/types";
-import { projectCategoryLabels } from "@/data/projects";
 import { ProjectThumbnail } from "@/components/ui/ProjectThumbnail";
 import { cn } from "@/lib/cn";
+import { projectCategoryLabel, projectCategoryTone } from "@/lib/project-categories";
 
 type ProjectModalProps = {
   project: Project | null;
@@ -105,10 +105,10 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
                     key={category}
                     className={cn(
                       "rounded-full px-2.5 py-1 text-[0.7rem] font-bold tracking-wide uppercase",
-                      category === "qa" ? "bg-mint-50 text-mint-700" : "bg-azure-50 text-azure-700",
+                      projectCategoryTone(category),
                     )}
                   >
-                    {projectCategoryLabels[category]}
+                    {projectCategoryLabel(category)}
                   </span>
                 ))}
               </div>
@@ -140,19 +140,29 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
 
               <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6">
                 <span className="text-sm text-muted">{project.displayUrl}</span>
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-ember-600 px-5 font-display text-sm font-bold text-white shadow-glow transition-all hover:-translate-y-0.5 hover:bg-ember-700"
-                  aria-label={`Visit the ${project.name} website (opens in a new tab)`}
-                >
-                  Visit Website
-                  <ArrowUpRight
-                    aria-hidden
-                    className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </a>
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href={`/projects/${project.slug}`}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong px-5 font-display text-sm font-bold text-ink-900 transition-colors hover:border-ink-900"
+                  >
+                    Full project page
+                  </a>
+                  {project.url ? (
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-ember-600 px-5 font-display text-sm font-bold text-white shadow-glow transition-all hover:-translate-y-0.5 hover:bg-ember-700"
+                      aria-label={`Visit the ${project.name} website (opens in a new tab)`}
+                    >
+                      Visit Website
+                      <ArrowUpRight
+                        aria-hidden
+                        className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </a>
+                  ) : null}
+                </div>
               </div>
             </div>
           </motion.div>

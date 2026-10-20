@@ -6,20 +6,28 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { ProjectModal } from "@/components/ui/ProjectModal";
-import { projectFilters, projects } from "@/data/projects";
 import { cn } from "@/lib/cn";
+import { projectCategories } from "@/lib/project-categories";
 import type { Project } from "@/types";
 
-type FilterId = (typeof projectFilters)[number]["id"];
-
-export function Projects() {
-  const [filter, setFilter] = useState<FilterId>("all");
+export function Projects({ projects }: { projects: Project[] }) {
+  const [filter, setFilter] = useState<string>("all");
   const [selected, setSelected] = useState<Project | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
+  const projectFilters = useMemo(
+    () => [
+      { id: "all", label: "All Projects" },
+      ...projectCategories
+        .filter((category) => projects.some((project) => project.categories.includes(category.id)))
+        .map((category) => ({ id: category.id, label: category.label })),
+    ],
+    [projects],
+  );
+
   const visible = useMemo(
     () => (filter === "all" ? projects : projects.filter((project) => project.categories.includes(filter))),
-    [filter],
+    [filter, projects],
   );
 
   const counts = useMemo(
@@ -29,8 +37,8 @@ export function Projects() {
           id,
           id === "all" ? projects.length : projects.filter((p) => p.categories.includes(id)).length,
         ]),
-      ) as Record<FilterId, number>,
-    [],
+      ) as Record<string, number>,
+    [projectFilters, projects],
   );
 
   const open = useCallback((project: Project, trigger: HTMLButtonElement) => {

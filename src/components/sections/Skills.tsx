@@ -2,27 +2,22 @@
 
 import { useRef, useState, type KeyboardEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { MonitorCog, Search, ShieldCheck, ShoppingCart, Users } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
-import { skillCategories } from "@/data/skills";
 import { accentStyles } from "@/lib/accent";
 import { cn } from "@/lib/cn";
+import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import type { SkillCategory } from "@/types";
 
-const icons: Record<string, typeof ShieldCheck> = {
-  qa: ShieldCheck,
-  seo: Search,
-  ecommerce: ShoppingCart,
-  operations: Users,
-  it: MonitorCog,
-};
+const numberWords = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 
-export function Skills() {
-  const [activeId, setActiveId] = useState(skillCategories[0].id);
+export function Skills({ categories: skillCategories }: { categories: SkillCategory[] }) {
+  const [activeId, setActiveId] = useState(skillCategories[0]?.id ?? "");
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  if (skillCategories.length === 0) return null;
   const active = skillCategories.find((c) => c.id === activeId) ?? skillCategories[0];
   const accent = accentStyles[active.accent];
-  const ActiveIcon = icons[active.id] ?? ShieldCheck;
+  const areaCount = numberWords[skillCategories.length] ?? String(skillCategories.length);
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const last = skillCategories.length - 1;
@@ -46,7 +41,10 @@ export function Skills() {
           eyebrow="Skills & tools"
           title={
             <>
-              A practical toolkit across <span className="text-ember-600">five areas</span>
+              A practical toolkit across{" "}
+              <span className="text-ember-600">
+                {areaCount} {skillCategories.length === 1 ? "area" : "areas"}
+              </span>
             </>
           }
           description="Hands-on skills and tools I use day to day, grouped by discipline. Choose a category to explore."
@@ -60,7 +58,6 @@ export function Skills() {
           >
             {skillCategories.map((category, index) => {
               const selected = category.id === activeId;
-              const Icon = icons[category.id] ?? ShieldCheck;
               return (
                 <button
                   key={category.id}
@@ -87,7 +84,7 @@ export function Skills() {
                       transition={{ type: "spring", stiffness: 400, damping: 34 }}
                     />
                   ) : null}
-                  <Icon aria-hidden className="relative size-4" />
+                  <DynamicIcon name={category.icon} aria-hidden className="relative size-4" />
                   <span className="relative">{category.label}</span>
                 </button>
               );
@@ -118,7 +115,7 @@ export function Skills() {
                   className={cn("absolute -right-12 -bottom-12 size-48 rounded-full opacity-40 blur-3xl", accent.bg)}
                 />
                 <span className={cn("relative grid size-12 place-items-center rounded-2xl text-white", accent.bg)}>
-                  <ActiveIcon aria-hidden className="size-6" />
+                  <DynamicIcon name={active.icon} aria-hidden className="size-6" />
                 </span>
                 <h3 className="relative mt-6 text-2xl font-extrabold text-white">{active.label}</h3>
                 <p className="relative mt-3 leading-relaxed text-white/70">{active.description}</p>
@@ -128,9 +125,10 @@ export function Skills() {
               </div>
 
               <ul className="card grid content-start gap-2.5 p-5 sm:grid-cols-2 sm:p-7 xl:grid-cols-3">
-                {active.skills.map((skill, index) => (
+                {active.skills.map((skill, index) => {
+                  return (
                   <motion.li
-                    key={skill}
+                    key={skill.name}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.025 * index, duration: 0.3 }}
@@ -139,16 +137,24 @@ export function Skills() {
                       accent.hoverBorder,
                     )}
                   >
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "size-2 shrink-0 rounded-full transition-transform group-hover:scale-150",
-                        accent.dot,
-                      )}
-                    />
-                    {skill}
+                    {skill.icon ? (
+                      <DynamicIcon name={skill.icon} aria-hidden className={cn("size-4 shrink-0", accent.text)} />
+                    ) : (
+                      <span
+                        aria-hidden
+                        className={cn(
+                          "size-2 shrink-0 rounded-full transition-transform group-hover:scale-150",
+                          accent.dot,
+                        )}
+                      />
+                    )}
+                    <span className="min-w-0 flex-1">{skill.name}</span>
+                    {skill.proficiency ? (
+                      <span className="shrink-0 text-xs font-medium text-muted">{skill.proficiency}</span>
+                    ) : null}
                   </motion.li>
-                ))}
+                  );
+                })}
               </ul>
             </motion.div>
           </AnimatePresence>

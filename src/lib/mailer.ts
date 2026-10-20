@@ -1,7 +1,8 @@
 import "server-only";
 import nodemailer from "nodemailer";
 import type { ContactInput } from "@/lib/validation";
-import { person } from "@/data/site";
+import { defaultSettings } from "@/data/site";
+import { getSettings } from "@/lib/content";
 
 type SmtpConfig = {
   host: string;
@@ -40,8 +41,17 @@ function readConfig(): SmtpConfig {
     user: env.SMTP_USER!,
     pass: env.SMTP_PASS!,
     from: process.env.SMTP_FROM || env.SMTP_USER!,
-    to: process.env.CONTACT_EMAIL || person.email,
+    to: process.env.CONTACT_EMAIL || "",
   };
+}
+
+async function recipient(config: SmtpConfig) {
+  if (config.to) return config.to;
+  try {
+    return (await getSettings()).email;
+  } catch {
+    return defaultSettings.email;
+  }
 }
 
 function escapeHtml(value: string) {
@@ -86,7 +96,7 @@ export async function sendContactEmail(input: ContactInput) {
 
   const info = await transporter.sendMail({
     from: config.from,
-    to: config.to,
+    to: await recipient(config),
     replyTo: { name: stripLineBreaks(input.name), address: input.email },
     subject,
     text,

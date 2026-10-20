@@ -2,37 +2,54 @@ import { ArrowUpRight, Mail } from "lucide-react";
 import { ContactForm } from "@/components/sections/ContactForm";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/Reveal";
-import { LinkedInIcon, WhatsAppIcon } from "@/components/ui/Icons";
-import { person, whatsappUrl } from "@/data/site";
+import { SocialIcon, WhatsAppIcon } from "@/components/ui/Icons";
+import { whatsappUrl } from "@/lib/contact";
+import type { SiteSettings, SocialPlatform } from "@/types";
 
-const channels = [
-  {
-    label: "Email",
-    value: person.email,
-    href: `mailto:${person.email}`,
-    icon: Mail,
-    external: false,
-    tone: "bg-ember-600",
-  },
-  {
-    label: "WhatsApp",
-    value: person.phoneDisplay,
-    href: whatsappUrl,
-    icon: WhatsAppIcon,
-    external: true,
-    tone: "bg-[#1da851]",
-  },
-  {
-    label: "LinkedIn",
-    value: "in/al-amin-sikander",
-    href: person.linkedin,
-    icon: LinkedInIcon,
-    external: true,
-    tone: "bg-azure-600",
-  },
-];
+type Channel = {
+  label: string;
+  value: string;
+  href: string;
+  icon: "mail" | "whatsapp" | SocialPlatform;
+  external: boolean;
+  tone: string;
+};
 
-export function Contact() {
+function ChannelIcon({ icon }: { icon: Channel["icon"] }) {
+  if (icon === "mail") return <Mail aria-hidden className="size-5" />;
+  if (icon === "whatsapp") return <WhatsAppIcon className="size-5" />;
+  return <SocialIcon platform={icon} className="size-5" />;
+}
+
+function contactChannels(settings: SiteSettings): Channel[] {
+  const channels: Channel[] = [
+    { label: "Email", value: settings.email, href: `mailto:${settings.email}`, icon: "mail", external: false, tone: "bg-ember-600" },
+  ];
+  if (settings.phone) {
+    channels.push({
+      label: "WhatsApp",
+      value: settings.phoneDisplay || settings.phone,
+      href: whatsappUrl(settings),
+      icon: "whatsapp",
+      external: true,
+      tone: "bg-[#1da851]",
+    });
+  }
+  for (const link of settings.socialLinks) {
+    channels.push({
+      label: link.platform === "linkedin" ? "LinkedIn" : link.label,
+      value: link.platform === "linkedin" ? link.label : link.url.replace(/^https?:\/\/(www\.)?/, ""),
+      href: link.url,
+      icon: link.platform,
+      external: true,
+      tone: link.platform === "linkedin" ? "bg-azure-600" : "bg-ink-700",
+    });
+  }
+  return channels;
+}
+
+export function Contact({ settings }: { settings: SiteSettings }) {
+  const channels = contactChannels(settings);
   return (
     <section
       id="contact"
@@ -57,9 +74,8 @@ export function Contact() {
 
           <RevealGroup as="ul" className="mt-10 space-y-3">
             {channels.map((channel) => {
-              const Icon = channel.icon;
               return (
-                <RevealItem as="li" key={channel.label}>
+                <RevealItem as="li" key={`${channel.label}-${channel.href}`}>
                   <a
                     href={channel.href}
                     {...(channel.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
@@ -67,7 +83,7 @@ export function Contact() {
                     className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08]"
                   >
                     <span className={`grid size-12 shrink-0 place-items-center rounded-xl text-white ${channel.tone}`}>
-                      <Icon aria-hidden className="size-5" />
+                      <ChannelIcon icon={channel.icon} />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-xs font-semibold tracking-wider text-white/50 uppercase">
@@ -91,7 +107,7 @@ export function Contact() {
         <Reveal delay={0.1} className="rounded-panel bg-white p-6 shadow-lift sm:p-9">
           <h3 className="text-xl font-extrabold sm:text-2xl">Send a message</h3>
           <p className="mt-1.5 mb-7 text-sm text-muted">Share a few details and I&apos;ll reply by email.</p>
-          <ContactForm />
+          <ContactForm email={settings.email} />
         </Reveal>
       </div>
     </section>

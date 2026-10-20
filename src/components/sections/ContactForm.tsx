@@ -11,7 +11,6 @@ import {
   type ContactFieldErrors,
   type ContactInput,
 } from "@/lib/validation";
-import { person } from "@/data/site";
 import { cn } from "@/lib/cn";
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -52,7 +51,7 @@ const fields: {
 const inputClass =
   "w-full rounded-xl border bg-canvas/60 px-4 py-3 text-[0.95rem] text-ink-950 placeholder:text-subtle transition-colors focus:bg-white focus:outline-none focus-visible:outline-none focus:ring-4";
 
-export function ContactForm() {
+export function ContactForm({ email }: { email: string }) {
   const [values, setValues] = useState<ContactInput>(emptyForm);
   const [errors, setErrors] = useState<ContactFieldErrors>({});
   const [status, setStatus] = useState<Status>("idle");
@@ -270,8 +269,8 @@ export function ContactForm() {
               <AlertCircle aria-hidden className="mt-0.5 size-5 shrink-0" />
               <p>
                 <strong className="font-semibold">Message not sent.</strong> {feedback}{" "}
-                <a href={`mailto:${person.email}`} className="font-semibold underline underline-offset-2">
-                  {person.email}
+                <a href={`mailto:${email}`} className="font-semibold underline underline-offset-2">
+                  {email}
                 </a>
               </p>
             </motion.div>

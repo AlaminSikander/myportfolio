@@ -4,8 +4,8 @@ import { useRef, type ReactNode } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { BadgeCheck, Bug, CheckCircle2, Search, ShieldCheck, Workflow } from "lucide-react";
-import { person } from "@/data/site";
 import { cn } from "@/lib/cn";
+import { isOptimizableImage } from "@/lib/images";
 
 type FloatingProps = {
   children: ReactNode;
@@ -33,7 +33,7 @@ function Floating({ children, className, delay = 0, offset }: FloatingProps) {
   );
 }
 
-export function HeroVisual() {
+export function HeroVisual({ name, photoUrl, location }: { name: string; photoUrl: string; location: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -65,23 +65,26 @@ export function HeroVisual() {
           style={{ y: photo }}
           className="animate-rise absolute inset-x-8 top-0 bottom-10 overflow-hidden rounded-[2rem] border-[6px] border-white bg-ink-800 shadow-lift sm:inset-x-10"
         >
-          <Image
-            src={person.photo}
-            alt={`Portrait of ${person.name}, Software QA Engineer and SEO Specialist`}
-            fill
-            preload
-            fetchPriority="high"
-            sizes="(min-width: 1024px) 400px, (min-width: 640px) 380px, 80vw"
-            className="object-cover object-[50%_20%]"
-          />
+          {photoUrl ? (
+            <Image
+              src={photoUrl}
+              alt={`Portrait of ${name}, Software QA Engineer and SEO Specialist`}
+              fill
+              preload
+              fetchPriority="high"
+              sizes="(min-width: 1024px) 400px, (min-width: 640px) 380px, 80vw"
+              unoptimized={!isOptimizableImage(photoUrl)}
+              className="object-cover object-[50%_20%]"
+            />
+          ) : null}
           <div
             aria-hidden
             className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink-950/70 to-transparent"
           />
           <div className="absolute inset-x-4 bottom-4 flex items-center justify-between gap-3 text-white">
             <div>
-              <p className="font-display text-sm font-bold sm:text-base">{person.name}</p>
-              <p className="text-xs text-white/75">{person.location}</p>
+              <p className="font-display text-sm font-bold sm:text-base">{name}</p>
+              <p className="text-xs text-white/75">{location}</p>
             </div>
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/15 backdrop-blur">
               <BadgeCheck aria-hidden className="size-5 text-mint-400" />

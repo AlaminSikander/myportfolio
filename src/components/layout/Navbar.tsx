@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
-import { navItems, person } from "@/data/site";
+import { navItems } from "@/data/site";
 import { cn } from "@/lib/cn";
+import { isOptimizableImage } from "@/lib/images";
 
-export function Navbar() {
+type NavLink = { key: string; label: string; href: string; sectionId?: string };
+
+export function Navbar({ shortName, logoUrl }: { shortName: string; logoUrl?: string }) {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState<string>("home");
   const [open, setOpen] = useState(false);
@@ -14,11 +22,22 @@ export function Navbar() {
   const panelRef = useRef<HTMLDivElement>(null);
   const pendingTarget = useRef<string | null>(null);
 
+  const links: NavLink[] = navItems.flatMap((item) => {
+    const link = { key: item.id, label: item.label, href: isHome ? `#${item.id}` : `/#${item.id}`, sectionId: item.id };
+    return item.id === "contact" ? [{ key: "blog", label: "Blog", href: "/blog" }, link] : [link];
+  });
+  const activeKey = isHome ? active : pathname.startsWith("/blog") ? "blog" : "";
+  const contactHref = isHome ? "#contact" : "/#contact";
+
   // Closing the menu animates the header, which cancels a native smooth scroll,
   // so mobile links defer scrolling until the exit animation has finished.
-  const navigateFromMenu = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+  const navigateFromMenu = (event: MouseEvent<HTMLAnchorElement>, link: NavLink) => {
+    if (!isHome || !link.sectionId) {
+      setOpen(false);
+      return;
+    }
     event.preventDefault();
-    pendingTarget.current = id;
+    pendingTarget.current = link.sectionId;
     setOpen(false);
   };
 
@@ -38,6 +57,7 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    if (!isHome) return;
     const sections = navItems
       .map(({ id }) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
@@ -51,7 +71,7 @@ export function Navbar() {
     );
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, []);
+  }, [isHome]);
 
   useEffect(() => {
     if (!open) return;
@@ -84,43 +104,64 @@ export function Navbar() {
     >
       <nav aria-label="Primary" className="container-page flex h-[4.5rem] items-center justify-between gap-6">
         <a
-          href="#home"
+          href={isHome ? "#home" : "/"}
           className="group flex items-center gap-2.5 rounded-lg"
-          aria-label={`${person.shortName} — back to top`}
+          aria-label={isHome ? `${shortName} — back to top` : `${shortName} — home`}
         >
-          <span
-            aria-hidden
-            className="flex size-9 items-center justify-center rounded-xl bg-ink-900 font-display text-base font-extrabold text-white transition-transform duration-300 group-hover:-rotate-6"
-          >
-            A<span className="text-ember-400">.</span>
-          </span>
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt=""
+              width={36}
+              height={36}
+              unoptimized={!isOptimizableImage(logoUrl)}
+              className="size-9 rounded-xl object-contain transition-transform duration-300 group-hover:-rotate-6"
+            />
+          ) : (
+            <span
+              aria-hidden
+              className="flex size-9 items-center justify-center rounded-xl bg-ink-900 font-display text-base font-extrabold text-white transition-transform duration-300 group-hover:-rotate-6"
+            >
+              {shortName.charAt(0)}
+              <span className="text-ember-400">.</span>
+            </span>
+          )}
           <span className="font-display text-lg font-extrabold tracking-tight text-ink-950">
-            Al Amin<span className="text-ember-600">.</span>
+            {shortName}
+            <span className="text-ember-600">.</span>
           </span>
         </a>
 
         <ul className="hidden items-center gap-1 lg:flex">
-          {navItems.map((item) => {
-            const isActive = active === item.id;
+          {links.map((link) => {
+            const isActive = activeKey === (link.sectionId ?? link.key);
+            const className = cn(
+              "relative rounded-full px-3 py-2 text-sm font-semibold transition-colors xl:px-3.5",
+              isActive ? "text-ink-950" : "text-muted hover:text-ink-950",
+            );
+            const content = (
+              <>
+                {isActive ? (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="absolute inset-0 -z-10 rounded-full bg-ink-900/[0.06]"
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  />
+                ) : null}
+                {link.label}
+              </>
+            );
             return (
-              <li key={item.id}>
-                <a
-                  href={`#${item.id}`}
-                  aria-current={isActive ? "true" : undefined}
-                  className={cn(
-                    "relative rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
-                    isActive ? "text-ink-950" : "text-muted hover:text-ink-950",
-                  )}
-                >
-                  {isActive ? (
-                    <motion.span
-                      layoutId="nav-active"
-                      className="absolute inset-0 -z-10 rounded-full bg-ink-900/[0.06]"
-                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                    />
-                  ) : null}
-                  {item.label}
-                </a>
+              <li key={link.key}>
+                {link.sectionId ? (
+                  <a href={link.href} aria-current={isActive ? "true" : undefined} className={className}>
+                    {content}
+                  </a>
+                ) : (
+                  <Link href={link.href} aria-current={isActive ? "page" : undefined} className={className}>
+                    {content}
+                  </Link>
+                )}
               </li>
             );
           })}
@@ -128,7 +169,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <a
-            href="#contact"
+            href={contactHref}
             className="group hidden items-center gap-1.5 rounded-full bg-ember-600 py-2.5 pr-2.5 pl-4.5 font-display text-sm font-bold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:bg-ember-700 sm:inline-flex"
           >
             Let&apos;s Talk
@@ -162,32 +203,37 @@ export function Navbar() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden border-t border-line bg-white lg:hidden"
           >
-            <ul className="container-page flex flex-col gap-1 py-4">
-              {navItems.map((item, index) => (
-                <motion.li
-                  key={item.id}
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.04 * index + 0.05 }}
-                >
-                  <a
-                    href={`#${item.id}`}
-                    onClick={(event) => navigateFromMenu(event, item.id)}
-                    aria-current={active === item.id ? "true" : undefined}
-                    className={cn(
-                      "flex min-h-12 items-center justify-between rounded-xl px-4 font-display text-base font-semibold transition-colors",
-                      active === item.id ? "bg-ember-50 text-ember-700" : "text-ink-900 hover:bg-canvas",
-                    )}
+            <ul className="container-page flex max-h-[calc(100dvh-4.5rem)] flex-col gap-1 overflow-y-auto py-4">
+              {links.map((link, index) => {
+                const isActive = activeKey === (link.sectionId ?? link.key);
+                return (
+                  <motion.li
+                    key={link.key}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 * index + 0.05 }}
                   >
-                    {item.label}
-                    <ArrowUpRight aria-hidden className="size-4 opacity-50" />
-                  </a>
-                </motion.li>
-              ))}
+                    <a
+                      href={link.href}
+                      onClick={(event) => navigateFromMenu(event, link)}
+                      aria-current={isActive ? "true" : undefined}
+                      className={cn(
+                        "flex min-h-12 items-center justify-between rounded-xl px-4 font-display text-base font-semibold transition-colors",
+                        isActive ? "bg-ember-50 text-ember-700" : "text-ink-900 hover:bg-canvas",
+                      )}
+                    >
+                      {link.label}
+                      <ArrowUpRight aria-hidden className="size-4 opacity-50" />
+                    </a>
+                  </motion.li>
+                );
+              })}
               <li className="pt-2 sm:hidden">
                 <a
-                  href="#contact"
-                  onClick={(event) => navigateFromMenu(event, "contact")}
+                  href={contactHref}
+                  onClick={(event) =>
+                    navigateFromMenu(event, { key: "contact", label: "Contact", href: contactHref, sectionId: "contact" })
+                  }
                   className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-ember-600 font-display font-bold text-white"
                 >
                   Let&apos;s Talk <ArrowUpRight aria-hidden className="size-4" />

@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Manrope } from "next/font/google";
 import { MotionProvider } from "@/components/MotionProvider";
-import { person, seo, siteUrl } from "@/data/site";
+import { siteUrl } from "@/data/site";
+import { getSettings } from "@/lib/content";
+import { siteName } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -12,41 +14,38 @@ const manrope = Manrope({
   weight: ["600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: seo.title,
-    template: `%s | ${person.name}`,
-  },
-  description: seo.description,
-  keywords: seo.keywords,
-  applicationName: `${person.name} — Portfolio`,
-  authors: [{ name: person.name, url: person.linkedin }],
-  creator: person.name,
-  alternates: { canonical: "/" },
-  openGraph: {
-    type: "profile",
-    url: "/",
-    siteName: `${person.name} — Portfolio`,
-    title: seo.title,
-    description: seo.description,
-    locale: "en_US",
-    firstName: "Md Al Amin",
-    lastName: "Sikander",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: seo.title,
-    description: seo.description,
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
-  },
-  formatDetection: { telephone: false },
-  category: "portfolio",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  const linkedin = settings.socialLinks.find((link) => link.platform === "linkedin");
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: settings.seoTitle,
+      template: `%s | ${settings.name}`,
+    },
+    description: settings.seoDescription,
+    keywords: settings.seoKeywords,
+    applicationName: siteName(settings),
+    authors: [{ name: settings.name, url: linkedin?.url ?? siteUrl }],
+    creator: settings.name,
+    openGraph: {
+      type: "website",
+      siteName: siteName(settings),
+      locale: "en_US",
+    },
+    twitter: { card: "summary_large_image" },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
+    icons: {
+      icon: settings.faviconUrl ? [{ url: settings.faviconUrl }] : [{ url: "/icon.svg", type: "image/svg+xml" }],
+    },
+    formatDetection: { telephone: false },
+    category: "portfolio",
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#0b1230",

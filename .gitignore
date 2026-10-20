@@ -12,6 +12,8 @@
 .DS_Store
 *.pem
 /tmp-shots
+/.local
+/public/uploads
 
 # debug
 npm-debug.log*
