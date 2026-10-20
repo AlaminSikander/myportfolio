@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme {
+  /* Ink — deep navy used for strong text and dark surfaces */
+  --color-ink-950: #060a1d;
+  --color-ink-900: #0b1230;
+  --color-ink-800: #151d42;
+  --color-ink-700: #27305a;
+  --color-ink-600: #3d4672;
+
+  /* Neutrals */
+  --color-canvas: #f6f7fb;
+  --color-surface: #ffffff;
+  --color-line: #e4e7f0;
+  --color-line-strong: #d3d8e5;
+  --color-muted: #566076;
+  --color-subtle: #8a93a8;
+
+  /* Ember — primary warm accent (Operations) */
+  --color-ember-50: #fff4ee;
+  --color-ember-100: #ffe4d6;
+  --color-ember-200: #ffc6aa;
+  --color-ember-400: #ff8150;
+  --color-ember-500: #f05a24;
+  --color-ember-600: #d13f0e;
+  --color-ember-700: #a8320b;
+
+  /* Mint — teal-green accent (Quality Assurance) */
+  --color-mint-50: #e9faf6;
+  --color-mint-100: #c9f2e8;
+  --color-mint-400: #3fd0b4;
+  --color-mint-500: #12b597;
+  --color-mint-600: #0b9580;
+  --color-mint-700: #08776a;
+
+  /* Azure — blue accent (SEO) */
+  --color-azure-50: #eef3ff;
+  --color-azure-100: #dbe5ff;
+  --color-azure-400: #6b95ff;
+  --color-azure-500: #3a6cf6;
+  --color-azure-600: #1f54db;
+  --color-azure-700: #1a43ad;
+
+  --radius-card: 1.25rem;
+  --radius-panel: 1.75rem;
+
+  --shadow-soft: 0 1px 2px rgb(11 18 48 / 0.04), 0 8px 24px -10px rgb(11 18 48 / 0.1);
+  --shadow-lift: 0 2px 6px rgb(11 18 48 / 0.05), 0 24px 48px -16px rgb(11 18 48 / 0.2);
+  --shadow-glow: 0 12px 32px -10px rgb(209 63 14 / 0.45);
+
+  --animate-drift: drift 18s ease-in-out infinite alternate;
+  --animate-drift-slow: drift 26s ease-in-out infinite alternate-reverse;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-dot: pulse-dot 2s ease-out infinite;
+  --animate-shimmer: shimmer 6s linear infinite;
+  --animate-rise: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes drift {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(4%, -6%, 0) scale(1.08); }
+    100% { transform: translate3d(-4%, 4%, 0) scale(0.96); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes pulse-dot {
+    0% { box-shadow: 0 0 0 0 rgb(18 181 151 / 0.55); }
+    70% { box-shadow: 0 0 0 8px rgb(18 181 151 / 0); }
+    100% { box-shadow: 0 0 0 0 rgb(18 181 151 / 0); }
+  }
+  @keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-ink-900 antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight text-ink-950;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    @apply bg-ember-100 text-ink-950;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember-600);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  section[id] {
+    scroll-margin-top: 5.5rem;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10;
+  }
+
+  .section-pad {
+    @apply py-20 sm:py-24 lg:py-28;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-display text-xs font-bold tracking-[0.18em] uppercase;
+  }
+
+  .card {
+    @apply rounded-card border border-line bg-surface shadow-soft;
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(11 18 48 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(11 18 48 / 0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .bg-grid-dark {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .text-gradient-brand {
+    background-image: linear-gradient(100deg, var(--color-mint-700), var(--color-azure-600) 50%, var(--color-ember-600));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .accent-line {
+    background-image: linear-gradient(90deg, var(--color-mint-500), var(--color-azure-500), var(--color-ember-500), var(--color-mint-500));
+    background-size: 200% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
