@@ -30,7 +30,7 @@ export const adminUsers = pgTable("admin_users", {
   passwordHash: text("password_hash").notNull(),
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   ...timestamps,
-});
+}).enableRLS();
 
 export const sessions = pgTable(
   "sessions",
@@ -44,7 +44,7 @@ export const sessions = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("sessions_user_id_idx").on(table.userId)],
-);
+).enableRLS();
 
 export const loginAttempts = pgTable(
   "login_attempts",
@@ -54,7 +54,7 @@ export const loginAttempts = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("login_attempts_key_created_idx").on(table.key, table.createdAt)],
-);
+).enableRLS();
 
 export const experiences = pgTable("experiences", {
   id: serial("id").primaryKey(),
@@ -72,7 +72,7 @@ export const experiences = pgTable("experiences", {
   accent: accentEnum("accent").notNull().default("ember"),
   status: statusEnum("status").notNull().default("published"),
   ...timestamps,
-});
+}).enableRLS();
 
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
@@ -95,7 +95,7 @@ export const projects = pgTable("projects", {
   accent: accentEnum("accent").notNull().default("ember"),
   sortOrder: integer("sort_order").notNull().default(0),
   ...timestamps,
-});
+}).enableRLS();
 
 export const skillCategories = pgTable("skill_categories", {
   id: serial("id").primaryKey(),
@@ -106,7 +106,7 @@ export const skillCategories = pgTable("skill_categories", {
   icon: text("icon").notNull().default("shield"),
   sortOrder: integer("sort_order").notNull().default(0),
   ...timestamps,
-});
+}).enableRLS();
 
 export const skills = pgTable(
   "skills",
@@ -122,7 +122,7 @@ export const skills = pgTable(
     ...timestamps,
   },
   (table) => [index("skills_category_idx").on(table.categoryId, table.sortOrder)],
-);
+).enableRLS();
 
 export const blogPosts = pgTable(
   "blog_posts",
@@ -145,7 +145,7 @@ export const blogPosts = pgTable(
     ...timestamps,
   },
   (table) => [index("blog_posts_status_published_idx").on(table.status, table.publishedAt)],
-);
+).enableRLS();
 
 export const siteSettings = pgTable("site_settings", {
   id: integer("id").primaryKey().default(1),
@@ -154,7 +154,7 @@ export const siteSettings = pgTable("site_settings", {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-});
+}).enableRLS();
 
 export type ExperienceRow = typeof experiences.$inferSelect;
 export type ProjectRow = typeof projects.$inferSelect;
