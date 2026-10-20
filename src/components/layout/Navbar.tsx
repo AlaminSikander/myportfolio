@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { navItems, person } from "@/data/site";
@@ -12,6 +12,23 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const pendingTarget = useRef<string | null>(null);
+
+  // Closing the menu animates the header, which cancels a native smooth scroll,
+  // so mobile links defer scrolling until the exit animation has finished.
+  const navigateFromMenu = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+    event.preventDefault();
+    pendingTarget.current = id;
+    setOpen(false);
+  };
+
+  const scrollToPendingTarget = () => {
+    const id = pendingTarget.current;
+    pendingTarget.current = null;
+    if (!id) return;
+    document.getElementById(id)?.scrollIntoView({ block: "start" });
+    window.history.pushState(null, "", `#${id}`);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -133,7 +150,7 @@ export function Navbar() {
         </div>
       </nav>
 
-      <AnimatePresence>
+      <AnimatePresence onExitComplete={scrollToPendingTarget}>
         {open ? (
           <motion.div
             ref={panelRef}
@@ -155,7 +172,7 @@ export function Navbar() {
                 >
                   <a
                     href={`#${item.id}`}
-                    onClick={() => setOpen(false)}
+                    onClick={(event) => navigateFromMenu(event, item.id)}
                     aria-current={active === item.id ? "true" : undefined}
                     className={cn(
                       "flex min-h-12 items-center justify-between rounded-xl px-4 font-display text-base font-semibold transition-colors",
@@ -170,7 +187,7 @@ export function Navbar() {
               <li className="pt-2 sm:hidden">
                 <a
                   href="#contact"
-                  onClick={() => setOpen(false)}
+                  onClick={(event) => navigateFromMenu(event, "contact")}
                   className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-ember-600 font-display font-bold text-white"
                 >
                   Let&apos;s Talk <ArrowUpRight aria-hidden className="size-4" />
