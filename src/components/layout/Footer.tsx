@@ -1,4 +1,4 @@
-import { ArrowUp, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { CurrentYear } from "@/components/ui/CurrentYear";
 import { LinkedInIcon } from "@/components/ui/Icons";
 import { navItems, person } from "@/data/site";
@@ -69,17 +69,10 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="container-page flex flex-col items-center justify-between gap-4 py-6 text-sm text-white/50 sm:flex-row">
+        <div className="container-page py-6 text-center text-sm text-white/50 sm:text-left">
           <p>
             © <CurrentYear /> {person.name}. All rights reserved.
           </p>
-          <a
-            href="#home"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 font-semibold text-white/80 transition-colors hover:border-white/40 hover:text-white"
-          >
-            Back to top
-            <ArrowUp aria-hidden className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
-          </a>
         </div>
       </div>
     </footer>
