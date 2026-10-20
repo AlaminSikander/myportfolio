@@ -24,5 +24,8 @@ export function createDb(url: string): Database {
   if (isNeonUrl(url)) {
     return drizzleNeon(neon(url), { schema }) as unknown as Database;
   }
-  return drizzlePostgres(postgres(url, { max: 5, prepare: false }), { schema });
+  return drizzlePostgres(
+    postgres(url, { max: 5, prepare: false, idle_timeout: 20, connect_timeout: 10 }),
+    { schema },
+  );
 }
